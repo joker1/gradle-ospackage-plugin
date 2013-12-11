@@ -90,6 +90,9 @@ class DebPluginTest {
             packageName = 'bleah'
             version = '1.0'
             release = '1'
+            arch 'amd64'
+            maintainer = "Superman"
+            uploaders = "Fantastic Four"
             permissionGroup = 'Development/Libraries'
             summary = 'Bleah blarg'
             packageDescription = 'Not a very interesting library.'
@@ -97,6 +100,8 @@ class DebPluginTest {
             distribution = 'SuperSystem'
             vendor = 'Super Associates, LLC'
             url = 'http://www.example.com/'
+
+            configurationFile '/etc/init.d/served'
 
             //requires('blarg', '1.0', GREATER | EQUAL)
             requires('blech')
@@ -119,12 +124,19 @@ class DebPluginTest {
 
         project.tasks.buildDeb.execute()
 
-        def scan = new Scanner(project.file('build/tmp/DebPluginTest/bleah_1.0-1_all.deb')) // , project.file('build/tmp/deboutput')
+        def scan = new Scanner(project.file('build/tmp/DebPluginTest/bleah_1.0-1_amd64.deb')) // , project.file('build/tmp/deboutput')
         assertEquals('bleah', scan.getHeaderEntry('Package'))
         assertEquals('blech', scan.getHeaderEntry('Depends'))
         assertEquals('bleah', scan.getHeaderEntry('Provides'))
         assertEquals('Bleah blarg\n Not a very interesting library.', scan.getHeaderEntry('Description'))
         assertEquals('http://www.example.com/', scan.getHeaderEntry('Homepage'))
+        assertEquals('Superman', scan.getHeaderEntry('Maintainer'))
+        assertEquals('amd64', scan.getHeaderEntry('Architecture'))
+        assertEquals('optional', scan.getHeaderEntry('Priority'))
+
+        scan.controlContents['./conffiles'].eachLine {
+            assertEquals('/etc/init.d/served', it)
+        }
 
         def file = scan.getEntry('./a/path/not/to/create/alone')
         assertTrue(file.isFile())

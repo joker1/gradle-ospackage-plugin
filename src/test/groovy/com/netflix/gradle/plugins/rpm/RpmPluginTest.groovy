@@ -53,7 +53,7 @@ class RpmPluginTest {
             version = '1.0'
             release = '1'
             type = BINARY
-            arch = I386
+            arch = I386.name()
             os = LINUX
             permissionGroup = 'Development/Libraries'
             summary = 'Bleah blarg'
