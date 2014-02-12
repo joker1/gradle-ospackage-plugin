@@ -20,9 +20,35 @@ import com.netflix.gradle.plugins.packaging.AbstractPackagingCopyAction
 import com.netflix.gradle.plugins.packaging.SystemPackagingTask
 import org.gradle.api.internal.ConventionMapping
 import org.gradle.api.internal.IConventionAware
+import org.freecompany.redline.header.Architecture
 
 class Deb extends SystemPackagingTask {
     static final String DEB_EXTENSION = "deb";
+
+    static final Map ARCH_MAP = [:]
+
+    static {
+        ARCH_MAP[Architecture.ALPHA] = 'alpha'
+        ARCH_MAP[Architecture.ARM] = 'arm'
+        ARCH_MAP[Architecture.I386] = 'i386'
+        ARCH_MAP[Architecture.IA64] = 'ia64'
+        // ARCH_MAP[Architecture.IP] = '??'
+        ARCH_MAP[Architecture.M68K] = 'm68k'
+        ARCH_MAP[Architecture.MIPS] = 'mips'
+        ARCH_MAP[Architecture.MIPSEL] = 'mipsel'
+        //ARCH_MAP[Architecture.MK68KMINT] = '??'
+        ARCH_MAP[Architecture.NOARCH] = 'all'
+        ARCH_MAP[Architecture.PPC] = 'powerpc'
+        ARCH_MAP[Architecture.PPC64] = 'ppc64'
+        //ARCH_MAP[Architecture.RS6000] = '??'
+        ARCH_MAP[Architecture.S390] = 's390'
+        ARCH_MAP[Architecture.S390X] = 's390x'
+        //ARCH_MAP[Architecture.SH] = '??'
+        ARCH_MAP[Architecture.SPARC] = 'sparc'
+        ARCH_MAP[Architecture.SPARC64] = 'sparc64'
+        ARCH_MAP[Architecture.X86_64] = 'amd64'
+        //ARCH_MAP[Architecture.XTENSA] = '??'
+    }
 
     Deb() {
         super()
@@ -41,7 +67,7 @@ class Deb extends SystemPackagingTask {
 
     @Override
     protected String getArchString() {
-        return 'all'; // TODO Make this configurable
+        return ARCH_MAP[arch]
     }
 
     @Override
@@ -61,6 +87,7 @@ class Deb extends SystemPackagingTask {
         mapping.map('uid', { parentExten?.getUid()?:0 })
         mapping.map('gid', { (parentExten?.getGid())?:0 })
         mapping.map('packageGroup', { parentExten?.getPackageGroup() ?: 'java' })
+        mapping.map('arch', { parentExten?.getArch()?:Architecture.NOARCH})
 
     }
 }

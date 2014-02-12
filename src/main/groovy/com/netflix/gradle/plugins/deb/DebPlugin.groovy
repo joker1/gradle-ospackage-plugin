@@ -16,7 +16,10 @@
 
 package com.netflix.gradle.plugins.deb
 
+import com.netflix.gradle.plugins.packaging.AliasHelper;
 import com.netflix.gradle.plugins.packaging.CommonPackagingPlugin
+
+import org.freecompany.redline.header.Architecture;
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -29,8 +32,14 @@ class DebPlugin implements Plugin<Project> {
 
         // Some defaults, if not set by the user
         project.tasks.withType(Deb) { Deb task ->
+            applyAliases(task)
+            
             task.applyConventions()
         }
 
+    }
+    
+    def static applyAliases(def dynamicObjectAware) {
+        AliasHelper.aliasEnumValues(Architecture.values(), dynamicObjectAware)
     }
 }

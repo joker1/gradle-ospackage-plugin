@@ -90,6 +90,7 @@ class DebPluginTest {
             packageName = 'bleah'
             version = '1.0'
             release = '1'
+			arch = I386
             permissionGroup = 'Development/Libraries'
             summary = 'Bleah blarg'
             packageDescription = 'Not a very interesting library.'
@@ -119,10 +120,11 @@ class DebPluginTest {
 
         project.tasks.buildDeb.execute()
 
-        def scan = new Scanner(project.file('build/tmp/DebPluginTest/bleah_1.0-1_all.deb')) // , project.file('build/tmp/deboutput')
+        def scan = new Scanner(project.file('build/tmp/DebPluginTest/bleah_1.0-1_i386.deb')) // , project.file('build/tmp/deboutput')
         assertEquals('bleah', scan.getHeaderEntry('Package'))
         assertEquals('blech', scan.getHeaderEntry('Depends'))
         assertEquals('bleah', scan.getHeaderEntry('Provides'))
+		assertEquals('i386', scan.getHeaderEntry('Architecture'))
         assertEquals('Bleah blarg\n Not a very interesting library.', scan.getHeaderEntry('Description'))
         assertEquals('http://www.example.com/', scan.getHeaderEntry('Homepage'))
 
