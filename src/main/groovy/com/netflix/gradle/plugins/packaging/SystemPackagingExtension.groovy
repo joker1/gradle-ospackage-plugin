@@ -42,20 +42,24 @@ class SystemPackagingExtension {
     String url
     String sourcePackage
     String provides
+    String arch
 
     // RPM Only
     Directive fileType
     Boolean createDirectoryEntry
     Boolean addParentDirs
-    Architecture arch
     Os os
     RpmType type
 
     // DEB Only
     Integer uid
     Integer gid
+    String maintainer
+    String uploaders
+    String priority
 
     // Scripts
+    final List<Object> configurationFiles = []
     final List<Object> preInstallCommands = []
     final List<Object> postInstallCommands = []
     final List<Object> preUninstallCommands = []
@@ -77,6 +81,19 @@ class SystemPackagingExtension {
 
     def installUtils(File script) {
         commonCommands << script
+        return this
+    }
+
+    /**
+     * For backwards compatibility
+     * @param script
+     */
+    def setConfigurationFile(String script) {
+        configurationFile(script)
+    }
+
+    def configurationFile(String path) {
+        configurationFiles << path
         return this
     }
 
@@ -140,7 +157,7 @@ class SystemPackagingExtension {
      * @param script
      */
     def setPostUninstall(File script) {
-        preUninstall(script)
+        postUninstall(script)
     }
 
     def postUninstall(String script) {
