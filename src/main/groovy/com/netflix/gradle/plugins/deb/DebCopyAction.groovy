@@ -229,10 +229,9 @@ class DebCopyAction extends AbstractPackagingCopyAction {
                 dirs: installDirs.collect { InstallDir dir ->
                     def map = [name: dir.name]
                     if(dir.user) {
+						map['owner'] = dir.user
                         if (dir.group) {
-                            map['owner'] = "${dir.user}:${dir.group}"
-                        } else {
-                            map['owner'] = dir.user
+                            map['group'] = dir.group
                         }
                     }
                     return map
