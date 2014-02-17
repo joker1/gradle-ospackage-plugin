@@ -1,9 +1,5 @@
-#!/bin/sh -e
-
-case "\$1" in
-    install)
-        <% commands.each {command -> %>
-        <%= command %>
-        <% } %>
-        ;;
-esac
+#!/bin/sh
+set -e
+<% commands.each {command -> %>
+<%= command %>
+<% } %>
