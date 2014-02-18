@@ -47,7 +47,8 @@ class DebCopyAction extends AbstractPackagingCopyAction {
     def debianDir
     List<String> dependencies
     List<DataProducer> dataProducers
-    List<InstallDir> installDirs
+    List<InstallFile> installDirs
+	List<InstallFile> installFiles
     boolean includeStandardDefines = true
 
     DebCopyAction(Deb debTask) {
@@ -57,10 +58,11 @@ class DebCopyAction extends AbstractPackagingCopyAction {
         dependencies = []
         dataProducers = []
         installDirs = []
+		installFiles = []
     }
 
     @Canonical
-    private static class InstallDir {
+    private static class InstallFile {
         String name
         String user
         String group
@@ -125,6 +127,13 @@ class DebCopyAction extends AbstractPackagingCopyAction {
         int fileMode = (int) (specFileMode?:fileDetails.mode)
 
         dataProducers << new DataProducerFileSimple(path, inputFile, user, uid, group, gid, fileMode)
+		
+		installFiles << new InstallFile(
+				name: "/" + fileDetails.relativePath.pathString,
+				user: user,
+				group: group,
+				mode: fileMode
+		)
     }
 
     @Override
@@ -146,7 +155,7 @@ class DebCopyAction extends AbstractPackagingCopyAction {
             dataProducers << new DataProducerDirectorySimple(dirName,user,uid,group,gid,dirMode)
 
             // addParentDirs is implicit in jdeb, I think.
-            installDirs << new InstallDir(
+            installDirs << new InstallFile(
                     name: "/" + dirDetails.relativePath.pathString,
                     user: user,
                     group: group,
@@ -228,7 +237,7 @@ class DebCopyAction extends AbstractPackagingCopyAction {
                 arch: debTask.getArch(),
 
                 // Uses install command for directory
-                dirs: installDirs.collect { InstallDir dir ->
+                dirs: installDirs.collect { InstallFile dir ->
                     def map = [name: dir.name]
 					map['mode'] = '0' + Integer.toString(dir.mode, 8)
                     if(dir.user) {
@@ -238,7 +247,20 @@ class DebCopyAction extends AbstractPackagingCopyAction {
                         }
                     }
                     return map
-                }
+                },
+				
+				// Uses install command for file
+				files: installFiles.collect { InstallFile file ->
+					def map = [name: file.name]
+					map['mode'] = '0' + Integer.toString(file.mode, 8)
+					if(file.user) {
+						map['owner'] = file.user
+						if (file.group) {
+							map['group'] = file.group
+						}
+					}
+					return map
+				}
         ]
     }
 
