@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
-
+<% commands.each {command -> %>
+<%= command %>
+<% } %>
 if [ "$1" = "configure" ]
 then
 	<% dirs.each{ dir -> %>
@@ -15,6 +17,3 @@ then
 	<% } %>
 	<% } %>
 fi
-<% commands.each {command -> %>
-<%= command %>
-<% } %>
