@@ -64,6 +64,7 @@ class DebCopyAction extends AbstractPackagingCopyAction {
         String name
         String user
         String group
+		int mode
     }
 
     @Override
@@ -138,17 +139,18 @@ class DebCopyAction extends AbstractPackagingCopyAction {
             String group = lookup(specToLookAt, 'permissionGroup') ?: debTask.permissionGroup
             int gid = (int) (lookup(specToLookAt, 'gid') ?: debTask.gid)
 
-            Integer specFileMode = lookup(specToLookAt, 'fileMode') // Integer to allow for null
-            int fileMode = (int) (specFileMode?:dirDetails.mode)
+            Integer specDirMode = lookup(specToLookAt, 'dirMode') // Integer to allow for null
+            int dirMode = (int) (specDirMode?:dirDetails.mode)
 
             String dirName =  "/" + dirDetails.relativePath.pathString
-            dataProducers << new DataProducerDirectorySimple(dirName,user,uid,group,gid,fileMode)
+            dataProducers << new DataProducerDirectorySimple(dirName,user,uid,group,gid,dirMode)
 
             // addParentDirs is implicit in jdeb, I think.
             installDirs << new InstallDir(
                     name: "/" + dirDetails.relativePath.pathString,
                     user: user,
                     group: group,
+					mode: dirMode
             )
         }
     }
@@ -228,6 +230,7 @@ class DebCopyAction extends AbstractPackagingCopyAction {
                 // Uses install command for directory
                 dirs: installDirs.collect { InstallDir dir ->
                     def map = [name: dir.name]
+					map['mode'] = '0' + Integer.toString(dir.mode, 8)
                     if(dir.user) {
 						map['owner'] = dir.user
                         if (dir.group) {
